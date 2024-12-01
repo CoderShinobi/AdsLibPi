@@ -1,0 +1,1 @@
+'C:\Users\ssaur\AppData\Local\Programs\Python\Python313\Scripts' which is not on PATH.
