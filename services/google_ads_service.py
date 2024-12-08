@@ -63,6 +63,23 @@ def get_accessible_customers(client, login_customer_id=None):
     return seed_customer_ids
 
 
+def get_linked_clients(client, manager_id):
+    ga_service = client.get_service("GoogleAdsService")
+    
+    # Query linked client accounts
+    query = """
+        SELECT
+          customer_client.id,
+          customer_client.descriptive_name
+        FROM customer_client
+        WHERE customer_client.manager = FALSE"""
+    
+    response = ga_service.search(
+        customer_id=manager_id,
+        query=query
+    )
+    return response
+
 def main(client, login_customer_id=None):
     """Gets the account hierarchy of the given MCC and login customer ID.
 
@@ -73,6 +90,18 @@ def main(client, login_customer_id=None):
       authenticated Google Ads account.
     """
     seed_customer_ids = get_accessible_customers(client, login_customer_id)
+
+    query = """
+        SELECT
+          customer_client.client_customer,
+          customer_client.level,
+          customer_client.manager,
+          customer_client.descriptive_name,
+          customer_client.currency_code,
+          customer_client.time_zone,
+          customer_client.id
+        FROM customer_client
+        WHERE customer_client.level <= 1"""
 
     if not seed_customer_ids:
         return

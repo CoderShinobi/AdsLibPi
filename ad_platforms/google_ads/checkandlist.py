@@ -221,7 +221,7 @@ if __name__ == "__main__":
     googleads_client = GoogleAdsClient.load_from_storage(version="v18")
     try:
         main(googleads_client, args.login_customer_id)
-        createCustomer(googleads_client, args.login_customer_id)
+        #createCustomer(googleads_client, args.login_customer_id)
     except GoogleAdsException as ex:
         print(
             f'Request with ID "{ex.request_id}" failed with status '
