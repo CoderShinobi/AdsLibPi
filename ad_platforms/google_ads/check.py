@@ -1,45 +1,31 @@
-import os
-from google.ads.googleads.client import GoogleAdsClient
-from google.ads.googleads.errors import GoogleAdsException
+from ad_platforms.google_ads.google_campaign_manager import GoogleCampaignManager
+from config.ad_campaign_data import GoogleAdsCampaign
 
-def check_credentials():
-    # First verify the config file exists
-    if not os.path.exists("google_ads.yaml"):
-        print("Error: google_ads.yaml file not found")
-        return False
-        
+def main():
+    # Create an instance of GoogleCampaignManager
+    campaign_manager = GoogleCampaignManager()
+
+    # Create a sample GoogleAdsCampaign data object
+    campaign_data = GoogleAdsCampaign(
+        campaign_id='1',
+        campaign_name="kutcoix",
+        budget=100,  # Budget in the currency's smallest unit
+        campaign_type="Video",
+        locations=["United States","India"],
+        languages=["English","Hindi"],
+        status="PAUSED",
+        bidding_strategy="Manual CPC",
+        networks=["Google Search Network", "Google Display Network"],
+        start_time="2025-01-01T00:00:00",
+        stop_time="2025-12-31T23:59:59"
+    )
+
+    # Call the create_campaign method
     try:
-        # Initialize the Google Ads client
-        client = GoogleAdsClient.load_from_storage(version="v18")
-        
-        # Verify client configuration
-        if not client.login_customer_id:
-            print("Error: login_customer_id not set in google_ads.yaml")
-            return False
-
-        # Get the CustomerService
-        customer_service = client.get_service("CustomerService")
-
-        # Make a simple API call to list accessible customers
-        accessible_customers = customer_service.list_accessible_customers()
-
-        result_total = len(accessible_customers.resource_names)
-        print(f"Total results: {result_total}")
-
-        print("Credentials are valid. Accessible customers:")
-        for resource_name in accessible_customers.resource_names:
-            print(resource_name)
-        return True
-
-    except GoogleAdsException as ex:
-        print(f"Google Ads API Error:")
-        print(f"Code: {ex.error.code().name}")
-        print(f"Message: {ex.error.message}")
-        print(f"Request ID: {ex.request_id}")
-        return False
+        campaign_resource_name = campaign_manager.create_campaign(campaign_data)
+        print(f"Campaign created with resource name: {campaign_resource_name}")
     except Exception as e:
-        print(f"Unexpected error: {str(e)}")
-        return False
+        print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
-    check_credentials()
+    main()

@@ -8,6 +8,9 @@ import ad_platforms.meta_ads.meta_campaign_manager as meta_c_manager
 
 try:
     c_manager = meta_c_manager.MetaAdsManager(meta_c_manager.config)
+    campaign_id = '120212430479090678'
+
+
     data = {
         'name': 'My Meta Campaign',  # campaign_name in MetaCampaign
         'status': 'PAUSED',
@@ -16,7 +19,7 @@ try:
         'specialAdCategoryCountry': ['IN'],
         'date_preset': 'last_30d',
         'time_range': {'since': '2024-01-01', 'until': '2024-01-31'},
-        'daily_budget': 1000,
+        'daily_budget': 100,
         'lifetime_budget': 10000,
         'bid_strategy': 'LOWEST_COST_WITHOUT_CAP',
         'start_time': '2024-01-01T00:00:00',
@@ -25,11 +28,8 @@ try:
         'updated_time': '2023-12-01T00:00:00',
         'buying_type': 'AUCTION'
     }
-    campaign = c_manager.create_campaign(data)
 
-    if not campaign:
-        print("No campaigns found.")
-    else:
-        print(campaign)
+
+    c_manager.update_campaign(campaign_id,data);
 except Exception as e:
     print(f"An error occurred: {e}")

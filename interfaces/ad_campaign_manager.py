@@ -1,14 +1,14 @@
 # ad_platform_manager.py
 from abc import ABC, abstractmethod
-from interfaces.ad_campaign_data import AdCampaignData
+from config.ad_campaign_data import AdCampaign
 
-class AdPlatformManager(ABC):
+class AdCampaignManager(ABC):
     @abstractmethod
-    def create_campaign(self, data: AdCampaignData):
+    def create_campaign(self, data: AdCampaign):
         pass
 
     @abstractmethod
-    def update_campaign(self, campaign_id: str, data: AdCampaignData):
+    def update_campaign(self, campaign_id: str, data: AdCampaign):
         pass
 
     @abstractmethod

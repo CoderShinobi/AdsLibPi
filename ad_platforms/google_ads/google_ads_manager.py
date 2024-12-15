@@ -1,21 +1,31 @@
 #!/usr/bin/env python
 import argparse
 import datetime
-import sys
+import os
 import uuid
 
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
 
+from dotenv import load_dotenv
+load_dotenv()
+
+class GoogleAdsConfig:
+    def __init__(self):
+        self.GOOGLE_LOGIN_CUSTOMER_ID = os.getenv('GOOGLE_LOGIN_CUSTOMER_ID')
+        self.GOOGLE_ADS_CUSTOMER_ID = os.getenv('GOOGLE_ADS_CUSTOMER_ID')
+
+env = GoogleAdsConfig()
+
 class GoogleAdsManager:
     def __init__(self):
         self.client = GoogleAdsClient.load_from_storage(version="v18")
-        self.client.login_customer_id = "1381653354"
+        self.client.login_customer_id = env.GOOGLE_LOGIN_CUSTOMER_ID
         self._DATE_FORMAT = "%Y%m%d"
 
     def create_campaign_with_budget(self):
         """Creates a campaign with associated budget."""
-        customer_id = "1402846494"
+        customer_id = env.GOOGLE_ADS_CUSTOMER_ID
         campaign_budget_service = self.client.get_service("CampaignBudgetService")
         campaign_service = self.client.get_service("CampaignService")
 
