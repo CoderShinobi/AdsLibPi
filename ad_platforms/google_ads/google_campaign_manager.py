@@ -22,7 +22,22 @@ class GoogleCampaignManager(AdCampaignManager):
         self.customer_id = os.getenv('GOOGLE_ADS_CUSTOMER_ID')
         log.info(f'Google Campaign Manager initialized with customer ID: {self.customer_id} and login customer ID: {self.client.login_customer_id}');
         
-    
+    def set_campaign_bidding_strategy(self, campaign, data):
+        """Sets the bidding strategy for a campaign"""
+        if data.bidding_strategy == "Target ROAS":
+            campaign.bidding_strategy_type = (
+                self.client.enums.BiddingStrategyTypeEnum.TARGET_ROAS
+            )
+            campaign.target_roas = self.client.get_type("TargetRoas")
+            campaign.target_roas.target_roas = 3.5  # 350% ROAS target
+            
+        elif data.bidding_strategy == "Manual CPC":
+            campaign.bidding_strategy_type = (
+                self.client.enums.BiddingStrategyTypeEnum.MANUAL_CPC
+            )
+            campaign.manual_cpc = self.client.get_type("ManualCpc")
+        else:
+            raise ValueError(f"Unsupported bidding strategy: {data.bidding_strategy}")
 
     def create_campaign(self, data: GoogleAdsCampaign):
         """Creates a campaign with associated budget."""
@@ -52,8 +67,8 @@ class GoogleCampaignManager(AdCampaignManager):
             # Map campaign_type to AdvertisingChannelTypeEnum
             channel_type_enum = self.client.enums.AdvertisingChannelTypeEnum
             campaign_type_mapping = {
-                "Search Network": channel_type_enum.SEARCH,
-                "Display Network": channel_type_enum.DISPLAY,
+                "Search": channel_type_enum.SEARCH,
+                "Display": channel_type_enum.DISPLAY,
                 "Shopping": channel_type_enum.SHOPPING,
                 "Video": channel_type_enum.VIDEO,
                 "App": channel_type_enum.MULTI_CHANNEL,
@@ -64,25 +79,27 @@ class GoogleCampaignManager(AdCampaignManager):
             )
 
             # Set status
-            status_enum = self.client.enums.CampaignStatusEnum
             status_mapping = {
-                "ENABLED": status_enum.ENABLED,
-                "PAUSED": status_enum.PAUSED,
-                "REMOVED": status_enum.REMOVED,
+                "ENABLED": self.client.enums.CampaignStatusEnum.ENABLED,
+                "PAUSED": self.client.enums.CampaignStatusEnum.PAUSED,
+                "REMOVED": self.client.enums.CampaignStatusEnum.REMOVED,
             }
-            campaign.status = status_mapping.get(data.status, status_enum.PAUSED)
+            campaign.status = status_mapping.get(data.status, self.client.enums.CampaignStatusEnum.PAUSED)
 
             # Set bidding strategy
-            if data.bidding_strategy == "Manual CPC":
-                campaign.manual_cpc.enhanced_cpc_enabled = True
+            self.set_campaign_bidding_strategy(campaign, data)
+            #if data.bidding_strategy == "Manual CPC":
+             #   campaign.manual_cpc.enhanced_cpc_enabled = True
 
             # Set budget
             campaign.campaign_budget = campaign_budget_resource_name
 
+            if data.campaign_type != "Video":
+                campaign.network_settings.target_google_search = True
             # Set network settings
-            campaign.network_settings.target_google_search = "Google Search Network" in data.networks
+            campaign.network_settings.target_google_search = "Search Network" in data.networks
             campaign.network_settings.target_search_network = "Search Partners" in data.networks
-            campaign.network_settings.target_content_network = "Google Display Network" in data.networks
+            campaign.network_settings.target_content_network = "Display Network" in data.networks
             campaign.network_settings.target_partner_search_network = False
 
             # Set dates

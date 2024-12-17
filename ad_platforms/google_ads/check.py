@@ -9,13 +9,13 @@ def main():
     campaign_data = GoogleAdsCampaign(
         campaign_id='1',
         campaign_name="kutcoix",
-        budget=100,  # Budget in the currency's smallest unit
-        campaign_type="Video",
-        locations=["United States","India"],
-        languages=["English","Hindi"],
+        budget=1000000,  # In micros (1000 USD)
+        campaign_type="Search",
+        locations=["US"],
+        languages=["en"],
         status="PAUSED",
         bidding_strategy="Manual CPC",
-        networks=["Google Search Network", "Google Display Network"],
+        networks=["Search Network"],
         start_time="2025-01-01T00:00:00",
         stop_time="2025-12-31T23:59:59"
     )
